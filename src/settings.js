@@ -9,7 +9,8 @@ function settingsPath() {
 function load() {
   const file = settingsPath()
   if (!fs.existsSync(file)) return {}
-  return JSON.parse(fs.readFileSync(file, 'utf8'))
+  // strip a UTF-8 BOM if an external editor left one behind
+  return JSON.parse(fs.readFileSync(file, 'utf8').replace(/^﻿/, ''))
 }
 
 function save(settings) {

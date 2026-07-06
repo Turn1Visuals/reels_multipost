@@ -226,6 +226,20 @@
       </section>
 
       <section>
+        <h3>Tunnel (ngrok)</h3>
+        <p class="muted note">Used to serve videos to Instagram. Optional — without it the app uses Cloudflare quick tunnels.</p>
+        <button class="toggle-credentials">Show credentials</button>
+        <div class="credentials" hidden>
+          <label>Authtoken
+            <input data-setting="ngrok.authtoken" type="password">
+          </label>
+          <label>Static domain (optional)
+            <input data-setting="ngrok.domain" type="text" placeholder="your-name.ngrok-free.app">
+          </label>
+        </div>
+      </section>
+
+      <section>
         <h3>X</h3>
         <button class="toggle-credentials">Show credentials</button>
         <div class="credentials" hidden>
