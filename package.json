@@ -3,13 +3,31 @@
   "version": "0.1.0",
   "description": "Personal hub for posting short videos to multiple platforms",
   "main": "src/main.js",
+  "author": "Turn 1 Visuals",
   "scripts": {
-    "start": "node launch.js"
+    "start": "node launch.js",
+    "dist": "electron-builder --win nsis"
   },
   "license": "UNLICENSED",
   "private": true,
+  "build": {
+    "appId": "com.turn1visuals.reels-multipost",
+    "productName": "Reels Multipost",
+    "files": [
+      "src/**/*",
+      "public/**/*"
+    ],
+    "win": {
+      "icon": "public/images/logo/reels multipost logo.png"
+    },
+    "nsis": {
+      "oneClick": true,
+      "createDesktopShortcut": true
+    }
+  },
   "devDependencies": {
-    "electron": "^41.7.1"
+    "electron": "^41.7.1",
+    "electron-builder": "^26.15.3"
   },
   "dependencies": {
     "googleapis": "^173.0.0"
