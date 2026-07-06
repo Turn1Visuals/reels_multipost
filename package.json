@@ -10,5 +10,8 @@
   "private": true,
   "devDependencies": {
     "electron": "^41.7.1"
+  },
+  "dependencies": {
+    "googleapis": "^173.0.0"
   }
 }

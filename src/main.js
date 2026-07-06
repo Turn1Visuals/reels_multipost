@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron')
+const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron')
 const path = require('path')
 const platforms = require('./platforms')
 const settings = require('./settings')
@@ -41,6 +41,8 @@ ipcMain.handle('get-platforms', () => {
     configured: p.isConfigured()
   }))
 })
+
+ipcMain.handle('open-external', (event, url) => shell.openExternal(url))
 
 ipcMain.handle('get-settings', () => settings.load())
 

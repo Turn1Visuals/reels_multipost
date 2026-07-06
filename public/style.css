@@ -178,10 +178,12 @@ button:disabled {
 }
 
 #status-list li {
-  display: flex;
-  align-items: center;
-  gap: 8px;
   font-size: 14px;
+  word-break: break-all;
+}
+
+#status-list a {
+  color: #4d90fe;
 }
 
 .status-posting { color: #f2c94c; }
@@ -196,6 +198,10 @@ button:disabled {
   align-items: center;
   justify-content: center;
   padding: 24px;
+}
+
+.overlay[hidden] {
+  display: none;
 }
 
 .modal {
