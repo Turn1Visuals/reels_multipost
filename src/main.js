@@ -3,7 +3,7 @@ const path = require('path')
 const fs = require('fs')
 const platforms = require('./platforms')
 const settings = require('./settings')
-const prefs = require('./prefs')
+const presets = require('./presets')
 const tokens = require('./tokens')
 
 let win
@@ -102,10 +102,10 @@ ipcMain.handle('open-external', (event, url) => shell.openExternal(url))
 // Renderer needs raw bytes: drawing a file:// video onto a canvas is blocked, a blob URL is not
 ipcMain.handle('read-file', (event, filePath) => fs.readFileSync(filePath))
 
-ipcMain.handle('get-prefs', () => prefs.load())
+ipcMain.handle('get-presets', () => presets.load())
 
-ipcMain.handle('save-prefs', (event, newPrefs) => {
-  prefs.save(newPrefs)
+ipcMain.handle('save-presets', (event, data) => {
+  presets.save(data)
 })
 
 ipcMain.handle('get-settings', () => settings.load())

@@ -10,30 +10,39 @@ const postButton = document.getElementById('post')
 const statusCard = document.getElementById('status-card')
 const statusList = document.getElementById('status-list')
 
-let savedPrefs = {}
+let appliedFields = {}
+let presetsData = { lastSelected: '', presets: {} }
 
-function prefFields() {
-  return document.querySelectorAll('.platform-options input, .platform-options select')
+// Everything a preset covers: details fields + all per-platform option fields.
+// New fields and platform panels are picked up automatically as long as they have an id.
+function formFields() {
+  return document.querySelectorAll('#title, #caption, #hashtags, .platform-options input, .platform-options select')
 }
 
-async function restorePrefs() {
-  savedPrefs = await window.api.getPrefs()
-  for (const el of prefFields()) {
-    if (!el.id || savedPrefs[el.id] === undefined) continue
-    if (el.type === 'checkbox') el.checked = savedPrefs[el.id]
-    else el.value = savedPrefs[el.id]
+function captureForm() {
+  const fields = {}
+  for (const el of formFields()) {
+    if (el.id) fields[el.id] = el.type === 'checkbox' ? el.checked : el.value
   }
-  for (const el of prefFields()) {
-    el.addEventListener('change', storePrefs)
-  }
+  return { fields, platforms: selectedPlatforms() }
 }
 
-function storePrefs() {
-  savedPrefs = {}
-  for (const el of prefFields()) {
-    if (el.id) savedPrefs[el.id] = el.type === 'checkbox' ? el.checked : el.value
+function applyPreset(name) {
+  const preset = presetsData.presets[name]
+  if (!preset) return
+  appliedFields = preset.fields
+  for (const el of formFields()) {
+    if (!el.id || preset.fields[el.id] === undefined) continue
+    if (el.type === 'checkbox') el.checked = preset.fields[el.id]
+    else el.value = preset.fields[el.id]
   }
-  window.api.savePrefs(savedPrefs)
+  for (const checkbox of platformsContainer.querySelectorAll('input[type="checkbox"]')) {
+    if (!checkbox.disabled) checkbox.checked = preset.platforms.includes(checkbox.value)
+    const panel = document.getElementById(checkbox.value + '-options')
+    if (panel) panel.hidden = !checkbox.checked
+  }
+  updateTiktokModeOptions()
+  updatePostButton()
 }
 
 async function loadPlaylists() {
@@ -47,8 +56,8 @@ async function loadPlaylists() {
     option.textContent = p.title
     select.appendChild(option)
   }
-  // fall back to the remembered playlist when the list arrives after restorePrefs
-  select.value = current || savedPrefs['youtube-playlist'] || ''
+  // fall back to the preset's playlist when the list arrives after the preset was applied
+  select.value = current || appliedFields['youtube-playlist'] || ''
 }
 
 async function loadPlatforms() {
@@ -58,6 +67,11 @@ async function loadPlatforms() {
   for (const panel of platformsContainer.querySelectorAll('.platform-options')) {
     holder.appendChild(panel)
   }
+  // keep the user's tick state across rebuilds (e.g. after saving settings)
+  const previousChecked = {}
+  for (const el of platformsContainer.querySelectorAll('input[type="checkbox"]')) {
+    previousChecked[el.value] = el.checked
+  }
   platformsContainer.innerHTML = ''
   for (const p of platforms) {
     const label = document.createElement('label')
@@ -65,7 +79,7 @@ async function loadPlatforms() {
     const checkbox = document.createElement('input')
     checkbox.type = 'checkbox'
     checkbox.value = p.id
-    checkbox.checked = p.configured
+    checkbox.checked = p.configured && !!previousChecked[p.id]
     checkbox.disabled = !p.configured
     checkbox.addEventListener('change', updatePostButton)
     label.appendChild(checkbox)
@@ -174,6 +188,13 @@ postButton.addEventListener('click', async () => {
 
 const settingsOverlay = document.getElementById('settings-overlay')
 
+for (const tab of document.querySelectorAll('.tab')) {
+  tab.addEventListener('click', () => {
+    for (const t of document.querySelectorAll('.tab')) t.classList.toggle('active', t === tab)
+    for (const panel of document.querySelectorAll('.tab-panel')) panel.hidden = panel.id !== 'tab-' + tab.dataset.tab
+  })
+}
+
 // Wires a connect/disconnect row in settings; returns a function that refreshes the status label
 function wireConnect(platformId, onChange) {
   const label = document.getElementById(platformId + '-connection')
@@ -230,6 +251,7 @@ document.getElementById('open-settings').addEventListener('click', async () => {
   }
   for (const box of settingsOverlay.querySelectorAll('.credentials')) box.hidden = true
   for (const button of settingsOverlay.querySelectorAll('.toggle-credentials')) button.textContent = 'Show credentials'
+  renderPresetManager()
   settingsOverlay.hidden = false
   for (const refresh of connectionRefreshers) refresh()
 })
@@ -274,8 +296,147 @@ window.api.onPostProgress(({ platformId, status, error, result }) => {
   }
 })
 
+const tiktokModeSelect = document.getElementById('tiktok-mode')
+const tiktokDirectOptions = document.getElementById('tiktok-direct-options')
+
+function updateTiktokModeOptions() {
+  tiktokDirectOptions.hidden = tiktokModeSelect.value !== 'direct'
+}
+
+tiktokModeSelect.addEventListener('change', updateTiktokModeOptions)
+
+const presetSelect = document.getElementById('preset-select')
+const presetOverlay = document.getElementById('preset-overlay')
+const presetSaveButton = document.getElementById('preset-save')
+const presetNameInput = document.getElementById('preset-name')
+
+function persistPresets() {
+  window.api.savePresets(presetsData)
+}
+
+function presetNames() {
+  return Object.keys(presetsData.presets).sort((a, b) => a.localeCompare(b))
+}
+
+function renderPresetSelect() {
+  presetSelect.innerHTML = '<option value="">(no preset)</option>'
+  for (const name of presetNames()) {
+    const option = document.createElement('option')
+    option.value = name
+    option.textContent = name
+    presetSelect.appendChild(option)
+  }
+  presetSelect.value = presetsData.lastSelected || ''
+}
+
+function clearForm() {
+  appliedFields = {}
+  for (const el of formFields()) {
+    if (el.type === 'checkbox') el.checked = false
+    else if (el.tagName === 'SELECT') el.selectedIndex = 0
+    else el.value = ''
+  }
+  for (const checkbox of platformsContainer.querySelectorAll('input[type="checkbox"]')) {
+    checkbox.checked = false
+    const panel = document.getElementById(checkbox.value + '-options')
+    if (panel) panel.hidden = true
+  }
+  updateTiktokModeOptions()
+  updatePostButton()
+}
+
+presetSelect.addEventListener('change', () => {
+  presetsData.lastSelected = presetSelect.value
+  persistPresets()
+  if (presetSelect.value) applyPreset(presetSelect.value)
+  else clearForm()
+})
+
+function savePresetAs(name) {
+  presetsData.presets[name] = captureForm()
+  presetsData.lastSelected = name
+  persistPresets()
+  presetOverlay.hidden = true
+  renderPresetSelect()
+}
+
+// Preset selected: save updates it in place. No preset: ask for a name.
+presetSaveButton.addEventListener('click', () => {
+  if (presetSelect.value) {
+    savePresetAs(presetSelect.value)
+    presetSaveButton.textContent = 'Saved ✓'
+    setTimeout(() => { presetSaveButton.textContent = 'Save' }, 1500)
+  } else {
+    presetNameInput.value = ''
+    presetOverlay.hidden = false
+    presetNameInput.focus()
+  }
+})
+
+document.getElementById('preset-cancel').addEventListener('click', () => {
+  presetOverlay.hidden = true
+})
+
+// Settings: rename presets in place, delete with ✕
+function renderPresetManager() {
+  const holder = document.getElementById('preset-manager')
+  holder.innerHTML = ''
+  const names = presetNames()
+  if (names.length === 0) {
+    holder.innerHTML = '<span class="muted">no presets yet</span>'
+    return
+  }
+  for (const name of names) {
+    const row = document.createElement('div')
+    row.className = 'preset-row'
+    const input = document.createElement('input')
+    input.type = 'text'
+    input.value = name
+    input.addEventListener('change', () => {
+      const newName = input.value.trim()
+      if (!newName || newName === name || presetsData.presets[newName]) {
+        input.value = name
+        return
+      }
+      presetsData.presets[newName] = presetsData.presets[name]
+      delete presetsData.presets[name]
+      if (presetsData.lastSelected === name) presetsData.lastSelected = newName
+      persistPresets()
+      renderPresetSelect()
+      renderPresetManager()
+    })
+    const del = document.createElement('button')
+    del.textContent = '✕'
+    del.title = 'Delete preset'
+    del.addEventListener('click', () => {
+      delete presetsData.presets[name]
+      if (presetsData.lastSelected === name) presetsData.lastSelected = ''
+      persistPresets()
+      renderPresetSelect()
+      renderPresetManager()
+    })
+    row.appendChild(input)
+    row.appendChild(del)
+    holder.appendChild(row)
+  }
+}
+
+document.getElementById('preset-save-confirm').addEventListener('click', () => {
+  const name = presetNameInput.value.trim()
+  if (!name) return
+  savePresetAs(name)
+})
+
+async function initPresets() {
+  presetsData = await window.api.getPresets()
+  if (!presetsData || !presetsData.presets) presetsData = { lastSelected: '', presets: {} }
+  renderPresetSelect()
+  if (presetsData.lastSelected) applyPreset(presetsData.lastSelected)
+}
+
 ;(async () => {
   await loadPlatforms()
-  await restorePrefs()
+  await initPresets()
+  updateTiktokModeOptions()
   await loadPlaylists()
 })()

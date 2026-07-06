@@ -294,6 +294,52 @@ button:disabled {
   font-size: 13px;
 }
 
+.tabs {
+  display: flex;
+  gap: 6px;
+}
+
+.tab {
+  padding: 6px 14px;
+  font-size: 13px;
+}
+
+.tab.active {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+
+.tab-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tab-panel[hidden] {
+  display: none;
+}
+
+.preset-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.preset-row + .preset-row {
+  margin-top: 10px;
+}
+
+.preset-row select,
+.preset-row input {
+  flex: 1;
+  width: auto;
+  margin-top: 0;
+}
+
+.preset-row button {
+  white-space: nowrap;
+}
+
 .toggle-credentials {
   font-size: 12px;
   padding: 4px 10px;

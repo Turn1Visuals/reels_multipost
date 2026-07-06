@@ -33,6 +33,16 @@
         </section>
 
         <section class="card">
+          <h2>Preset</h2>
+          <div class="preset-row">
+            <select id="preset-select">
+              <option value="">(no preset)</option>
+            </select>
+            <button id="preset-save">Save</button>
+          </div>
+        </section>
+
+        <section class="card">
           <h2>Details</h2>
           <label>Title
             <input id="title" type="text" placeholder="Monaco GP — Race Results">
@@ -70,17 +80,19 @@
           <option value="direct">Direct post</option>
         </select>
       </label>
-      <label>Privacy (direct post)
-        <select id="tiktok-privacy">
-          <option value="SELF_ONLY">Only me</option>
-          <option value="PUBLIC_TO_EVERYONE">Public</option>
-          <option value="MUTUAL_FOLLOW_FRIENDS">Friends</option>
-          <option value="FOLLOWER_OF_CREATOR">Followers</option>
-        </select>
-      </label>
-      <label class="checkbox-option"><input id="tiktok-disable-comment" type="checkbox"> Disable comments</label>
-      <label class="checkbox-option"><input id="tiktok-disable-duet" type="checkbox"> Disable duet</label>
-      <label class="checkbox-option"><input id="tiktok-disable-stitch" type="checkbox"> Disable stitch</label>
+      <div id="tiktok-direct-options" hidden>
+        <label>Privacy
+          <select id="tiktok-privacy">
+            <option value="SELF_ONLY">Only me</option>
+            <option value="PUBLIC_TO_EVERYONE">Public</option>
+            <option value="MUTUAL_FOLLOW_FRIENDS">Friends</option>
+            <option value="FOLLOWER_OF_CREATOR">Followers</option>
+          </select>
+        </label>
+        <label class="checkbox-option"><input id="tiktok-disable-comment" type="checkbox"> Disable comments</label>
+        <label class="checkbox-option"><input id="tiktok-disable-duet" type="checkbox"> Disable duet</label>
+        <label class="checkbox-option"><input id="tiktok-disable-stitch" type="checkbox"> Disable stitch</label>
+      </div>
     </div>
     <div id="youtube-options" class="platform-options">
       <label>Playlist
@@ -117,6 +129,19 @@
     </div>
   </div>
 
+  <div id="preset-overlay" class="overlay" hidden>
+    <div class="modal">
+      <div class="modal-header">
+        <h2>New preset</h2>
+        <button id="preset-cancel">✕</button>
+      </div>
+      <label>Name
+        <input id="preset-name" type="text" placeholder="F1 results">
+      </label>
+      <button id="preset-save-confirm" class="post-button">Save preset</button>
+    </div>
+  </div>
+
   <div id="settings-overlay" class="overlay" hidden>
     <div class="modal">
       <div class="modal-header">
@@ -124,6 +149,16 @@
         <button id="close-settings">✕</button>
       </div>
 
+      <div class="tabs">
+        <button class="tab active" data-tab="accounts">Accounts</button>
+        <button class="tab" data-tab="presets">Presets</button>
+      </div>
+
+      <div id="tab-presets" class="tab-panel" hidden>
+        <div id="preset-manager"></div>
+      </div>
+
+      <div id="tab-accounts" class="tab-panel">
       <section>
         <h3>YouTube</h3>
         <button class="toggle-credentials">Show credentials</button>
@@ -185,6 +220,7 @@
       </section>
 
       <button id="save-settings" class="post-button">Save</button>
+      </div>
     </div>
   </div>
 
