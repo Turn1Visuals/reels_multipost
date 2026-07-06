@@ -18,4 +18,9 @@ function save(platformId, data) {
   fs.writeFileSync(file, JSON.stringify(data, null, 2))
 }
 
-module.exports = { load, save }
+function remove(platformId) {
+  const file = tokenPath(platformId)
+  if (fs.existsSync(file)) fs.unlinkSync(file)
+}
+
+module.exports = { load, save, remove }

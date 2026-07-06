@@ -11,7 +11,8 @@ contextBridge.exposeInMainWorld('api', {
   openExternal: (url) => ipcRenderer.invoke('open-external', url),
   readFile: (path) => ipcRenderer.invoke('read-file', path),
   getYoutubePlaylists: () => ipcRenderer.invoke('get-youtube-playlists'),
-  youtubeConnect: () => ipcRenderer.invoke('youtube-connect'),
-  youtubeConnection: () => ipcRenderer.invoke('youtube-connection'),
+  platformConnect: (id) => ipcRenderer.invoke('platform-connect', id),
+  platformDisconnect: (id) => ipcRenderer.invoke('platform-disconnect', id),
+  platformConnection: (id) => ipcRenderer.invoke('platform-connection', id),
   onPostProgress: (callback) => ipcRenderer.on('post-progress', (event, data) => callback(data))
 })

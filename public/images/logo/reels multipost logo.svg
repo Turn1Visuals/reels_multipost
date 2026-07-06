@@ -1,0 +1,20 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="1024" height="1024" fill="black"/>
+<path d="M512 303C627.428 303 721 396.572 721 512C721 627.428 627.428 721 512 721C396.572 721 303 627.428 303 512C303 396.572 396.572 303 512 303ZM474.75 408.01C459.417 399.157 440.25 410.223 440.25 427.929V595.071C440.25 612.777 459.417 623.843 474.75 614.99L619.5 531.419C634.833 522.566 634.833 500.434 619.5 491.581L474.75 408.01Z" fill="white"/>
+<circle cx="512" cy="120" r="55" fill="#FF0000"/>
+<circle cx="512" cy="904" r="55" fill="#FF8000"/>
+<circle cx="904" cy="512" r="55" transform="rotate(90 904 512)" fill="#3C00FF"/>
+<circle cx="120" cy="512" r="55" transform="rotate(90 120 512)" fill="#FFFB00"/>
+<circle cx="789.186" cy="234.814" r="55" transform="rotate(45 789.186 234.814)" fill="#00FF2F"/>
+<circle cx="234.814" cy="789.186" r="55" transform="rotate(45 234.814 789.186)" fill="#FF00E6"/>
+<circle cx="789.186" cy="789.186" r="55" transform="rotate(135 789.186 789.186)" fill="#00FFBF"/>
+<circle cx="234.814" cy="234.814" r="55" transform="rotate(135 234.814 234.814)" fill="#6A39A7"/>
+<rect x="832.5" y="508.5" width="10" height="91" rx="5" transform="rotate(90 832.5 508.5)" fill="#3B00FF"/>
+<rect x="282.5" y="508.5" width="10" height="91" rx="5" transform="rotate(90 282.5 508.5)" fill="#FFFB00"/>
+<rect x="742.163" y="736.592" width="10" height="91" rx="5" transform="rotate(135 742.163 736.592)" fill="#00FFBF"/>
+<rect x="353.255" y="347.684" width="10" height="91" rx="5" transform="rotate(135 353.255 347.684)" fill="#6A39A7"/>
+<rect x="517" y="834" width="10" height="91" rx="5" transform="rotate(-180 517 834)" fill="#FF8000"/>
+<rect x="517" y="284" width="10" height="91" rx="5" transform="rotate(-180 517 284)" fill="#FF0000"/>
+<rect x="288.908" y="743.663" width="10" height="91" rx="5" transform="rotate(-135 288.908 743.663)" fill="#FF00E5"/>
+<rect x="677.817" y="354.754" width="10" height="91" rx="5" transform="rotate(-135 677.817 354.754)" fill="#00FF2F"/>
+</svg>

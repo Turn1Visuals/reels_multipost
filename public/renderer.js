@@ -163,27 +163,53 @@ postButton.addEventListener('click', async () => {
 
 const settingsOverlay = document.getElementById('settings-overlay')
 
-const youtubeConnectionLabel = document.getElementById('youtube-connection')
+// Wires a connect/disconnect row in settings; returns a function that refreshes the status label
+function wireConnect(platformId, onChange) {
+  const label = document.getElementById(platformId + '-connection')
+  const button = document.getElementById(platformId + '-connect')
+  let connected = false
 
-async function refreshYoutubeConnection() {
-  const info = await window.api.youtubeConnection()
-  youtubeConnectionLabel.textContent = info.connected ? 'connected: ' + info.channel : 'not connected'
-  youtubeConnectionLabel.className = info.connected ? 'status-done' : 'muted'
+  const render = (info) => {
+    connected = info.connected
+    button.textContent = connected ? 'Disconnect' : 'Connect account'
+    label.textContent = connected ? 'connected: ' + info.account : 'not connected'
+    label.className = connected ? 'status-done' : 'muted'
+  }
+
+  button.addEventListener('click', async () => {
+    if (connected) {
+      await window.api.platformDisconnect(platformId)
+      render({ connected: false })
+      if (onChange) onChange()
+      return
+    }
+    label.textContent = 'waiting for browser login…'
+    label.className = 'muted'
+    try {
+      const info = await window.api.platformConnect(platformId)
+      render({ connected: true, account: info.account })
+      if (onChange) onChange()
+    } catch (err) {
+      label.textContent = 'connection failed'
+      label.className = 'status-error'
+    }
+  })
+
+  return async () => render(await window.api.platformConnection(platformId))
 }
 
-document.getElementById('youtube-connect').addEventListener('click', async () => {
-  youtubeConnectionLabel.textContent = 'waiting for browser login…'
-  youtubeConnectionLabel.className = 'muted'
-  try {
-    const info = await window.api.youtubeConnect()
-    youtubeConnectionLabel.textContent = 'connected: ' + info.channel
-    youtubeConnectionLabel.className = 'status-done'
-    loadPlaylists()
-  } catch (err) {
-    youtubeConnectionLabel.textContent = 'connection failed'
-    youtubeConnectionLabel.className = 'status-error'
-  }
-})
+const connectionRefreshers = [
+  wireConnect('youtube', loadPlaylists),
+  wireConnect('tiktok')
+]
+
+for (const button of document.querySelectorAll('.toggle-credentials')) {
+  button.addEventListener('click', () => {
+    const box = button.parentElement.querySelector('.credentials')
+    box.hidden = !box.hidden
+    button.textContent = box.hidden ? 'Show credentials' : 'Hide credentials'
+  })
+}
 
 document.getElementById('open-settings').addEventListener('click', async () => {
   const settings = await window.api.getSettings()
@@ -191,8 +217,10 @@ document.getElementById('open-settings').addEventListener('click', async () => {
     const [section, key] = input.dataset.setting.split('.')
     input.value = (settings[section] && settings[section][key]) || ''
   }
+  for (const box of settingsOverlay.querySelectorAll('.credentials')) box.hidden = true
+  for (const button of settingsOverlay.querySelectorAll('.toggle-credentials')) button.textContent = 'Show credentials'
   settingsOverlay.hidden = false
-  refreshYoutubeConnection()
+  for (const refresh of connectionRefreshers) refresh()
 })
 
 document.getElementById('close-settings').addEventListener('click', () => {

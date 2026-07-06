@@ -107,12 +107,15 @@
 
       <section>
         <h3>YouTube</h3>
-        <label>Client ID
-          <input data-setting="youtube.clientId" type="text">
-        </label>
-        <label>Client secret
-          <input data-setting="youtube.clientSecret" type="password">
-        </label>
+        <button class="toggle-credentials">Show credentials</button>
+        <div class="credentials" hidden>
+          <label>Client ID
+            <input data-setting="youtube.clientId" type="text">
+          </label>
+          <label>Client secret
+            <input data-setting="youtube.clientSecret" type="password">
+          </label>
+        </div>
         <div class="connect-row">
           <button id="youtube-connect">Connect account</button>
           <span id="youtube-connection" class="muted">not connected</span>
@@ -121,32 +124,45 @@
 
       <section>
         <h3>TikTok</h3>
-        <label>Client key
-          <input data-setting="tiktok.clientKey" type="text">
-        </label>
-        <label>Client secret
-          <input data-setting="tiktok.clientSecret" type="password">
-        </label>
+        <button class="toggle-credentials">Show credentials</button>
+        <div class="credentials" hidden>
+          <label>Client key
+            <input data-setting="tiktok.clientKey" type="text">
+          </label>
+          <label>Client secret
+            <input data-setting="tiktok.clientSecret" type="password">
+          </label>
+        </div>
+        <div class="connect-row">
+          <button id="tiktok-connect">Connect account</button>
+          <span id="tiktok-connection" class="muted">not connected</span>
+        </div>
       </section>
 
       <section>
         <h3>Meta (Instagram + Facebook)</h3>
-        <label>App ID
-          <input data-setting="meta.appId" type="text">
-        </label>
-        <label>App secret
-          <input data-setting="meta.appSecret" type="password">
-        </label>
+        <button class="toggle-credentials">Show credentials</button>
+        <div class="credentials" hidden>
+          <label>App ID
+            <input data-setting="meta.appId" type="text">
+          </label>
+          <label>App secret
+            <input data-setting="meta.appSecret" type="password">
+          </label>
+        </div>
       </section>
 
       <section>
         <h3>X</h3>
-        <label>API key
-          <input data-setting="x.apiKey" type="text">
-        </label>
-        <label>API secret
-          <input data-setting="x.apiSecret" type="password">
-        </label>
+        <button class="toggle-credentials">Show credentials</button>
+        <div class="credentials" hidden>
+          <label>API key
+            <input data-setting="x.apiKey" type="text">
+          </label>
+          <label>API secret
+            <input data-setting="x.apiSecret" type="password">
+          </label>
+        </div>
       </section>
 
       <button id="save-settings" class="post-button">Save</button>

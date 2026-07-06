@@ -293,3 +293,13 @@ button:disabled {
   gap: 10px;
   font-size: 13px;
 }
+
+.toggle-credentials {
+  font-size: 12px;
+  padding: 4px 10px;
+  margin-bottom: 10px;
+}
+
+.credentials[hidden] {
+  display: none;
+}

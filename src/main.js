@@ -4,6 +4,7 @@ const fs = require('fs')
 const platforms = require('./platforms')
 const settings = require('./settings')
 const prefs = require('./prefs')
+const tokens = require('./tokens')
 
 let win
 
@@ -79,9 +80,14 @@ ipcMain.handle('select-video', async () => {
 
 ipcMain.handle('get-youtube-playlists', () => platforms.get('youtube').listPlaylists())
 
-ipcMain.handle('youtube-connect', () => platforms.get('youtube').connect())
+ipcMain.handle('platform-connect', (event, id) => platforms.get(id).connect())
 
-ipcMain.handle('youtube-connection', () => platforms.get('youtube').getConnection())
+ipcMain.handle('platform-disconnect', (event, id) => tokens.remove(id))
+
+ipcMain.handle('platform-connection', (event, id) => {
+  const platform = platforms.get(id)
+  return platform.getConnection ? platform.getConnection() : { connected: false }
+})
 
 ipcMain.handle('get-platforms', () => {
   return platforms.list().map((p) => ({
