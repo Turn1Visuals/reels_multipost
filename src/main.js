@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron')
 const path = require('path')
+const fs = require('fs')
 const platforms = require('./platforms')
 const settings = require('./settings')
 
@@ -34,6 +35,8 @@ ipcMain.handle('select-video', async () => {
   return result.filePaths[0]
 })
 
+ipcMain.handle('get-youtube-playlists', () => platforms.get('youtube').listPlaylists())
+
 ipcMain.handle('get-platforms', () => {
   return platforms.list().map((p) => ({
     id: p.id,
@@ -43,6 +46,9 @@ ipcMain.handle('get-platforms', () => {
 })
 
 ipcMain.handle('open-external', (event, url) => shell.openExternal(url))
+
+// Renderer needs raw bytes: drawing a file:// video onto a canvas is blocked, a blob URL is not
+ipcMain.handle('read-file', (event, filePath) => fs.readFileSync(filePath))
 
 ipcMain.handle('get-settings', () => settings.load())
 

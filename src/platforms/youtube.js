@@ -2,10 +2,12 @@ const { google } = require('googleapis')
 const { shell } = require('electron')
 const http = require('http')
 const fs = require('fs')
+const { Readable } = require('stream')
 const credentials = require('./credentials')
 const tokens = require('../tokens')
 
-const SCOPES = ['https://www.googleapis.com/auth/youtube.upload']
+// Full scope: upload + playlist management
+const SCOPES = ['https://www.googleapis.com/auth/youtube']
 
 // Opens the browser for Google consent; a temporary local server catches the redirect
 function authorizeNew(creds) {
@@ -67,26 +69,77 @@ module.exports = {
   id: 'youtube',
   name: 'YouTube',
   isConfigured: () => credentials.forPlatform('youtube') !== null,
+  // Only lists when already logged in — must not pop the consent browser on app start
+  listPlaylists: async () => {
+    const creds = credentials.forPlatform('youtube')
+    const saved = tokens.load('youtube')
+    if (!creds || !saved || !saved.refresh_token) return []
+    try {
+      const auth = await getAuthedClient()
+      const youtube = google.youtube({ version: 'v3', auth })
+      const res = await youtube.playlists.list({ part: ['snippet'], mine: true, maxResults: 50 })
+      return res.data.items.map((p) => ({ id: p.id, title: p.snippet.title }))
+    } catch (err) {
+      return []
+    }
+  },
   post: async ({ videoPath, meta }) => {
     const auth = await getAuthedClient()
     const youtube = google.youtube({ version: 'v3', auth })
 
     const description = [meta.caption, meta.hashtags].filter(Boolean).join('\n\n')
+    const snippet = {
+      title: meta.title || 'Untitled',
+      description
+    }
+    if (meta.youtubeTags) snippet.tags = meta.youtubeTags.split(',').map((t) => t.trim()).filter(Boolean)
+    if (meta.youtubeCategoryId) snippet.categoryId = meta.youtubeCategoryId
+
     const res = await youtube.videos.insert({
       part: ['snippet', 'status'],
       requestBody: {
-        snippet: {
-          title: meta.title || 'Untitled',
-          description
-        },
+        snippet,
         status: {
-          privacyStatus: 'public',
+          privacyStatus: meta.youtubePrivacy || 'public',
           selfDeclaredMadeForKids: false
         }
       },
       media: { body: fs.createReadStream(videoPath) }
     })
 
-    return { videoId: res.data.id, url: 'https://youtu.be/' + res.data.id }
+    const result = { videoId: res.data.id, url: 'https://youtu.be/' + res.data.id }
+
+    const warnings = []
+
+    if (meta.thumbnailDataUrl) {
+      try {
+        const buffer = Buffer.from(meta.thumbnailDataUrl.split(',')[1], 'base64')
+        await youtube.thumbnails.set({
+          videoId: res.data.id,
+          media: { mimeType: 'image/jpeg', body: Readable.from(buffer) }
+        })
+      } catch (err) {
+        warnings.push('thumbnail failed: ' + err.message)
+      }
+    }
+
+    if (meta.youtubePlaylistId) {
+      try {
+        await youtube.playlistItems.insert({
+          part: ['snippet'],
+          requestBody: {
+            snippet: {
+              playlistId: meta.youtubePlaylistId,
+              resourceId: { kind: 'youtube#video', videoId: res.data.id }
+            }
+          }
+        })
+      } catch (err) {
+        warnings.push('playlist add failed: ' + err.message)
+      }
+    }
+
+    if (warnings.length > 0) result.warning = 'video posted, but ' + warnings.join('; ')
+    return result
   }
 }
