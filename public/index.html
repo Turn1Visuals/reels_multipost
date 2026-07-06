@@ -17,12 +17,14 @@
         <section class="card">
           <h2>Video</h2>
           <div class="video-row">
-            <button id="select-video">Select video…</button>
+            <div class="video-buttons">
+              <button id="select-video">Select video…</button>
+              <button id="capture-frame" hidden>Use current frame as thumbnail</button>
+            </div>
             <span id="video-name" class="muted">No video selected</span>
           </div>
-          <video id="video-preview" controls hidden></video>
-          <div id="thumb-row" hidden>
-            <button id="capture-frame">Use current frame as thumbnail</button>
+          <div class="preview-row">
+            <video id="video-preview" controls hidden></video>
             <div id="thumb-preview-wrap" hidden>
               <img id="thumb-preview" alt="Thumbnail">
               <button id="remove-thumb" title="Remove thumbnail">✕</button>
@@ -42,41 +44,6 @@
             <input id="hashtags" type="text" placeholder="#f1 #monacogp #formula1">
           </label>
         </section>
-
-        <section class="card">
-          <h2>YouTube options</h2>
-          <label>Playlist
-            <select id="youtube-playlist">
-              <option value="">(none)</option>
-            </select>
-          </label>
-          <label>Privacy
-            <select id="youtube-privacy">
-              <option value="public">Public</option>
-              <option value="unlisted">Unlisted</option>
-              <option value="private">Private</option>
-            </select>
-          </label>
-          <label>Tags (comma separated)
-            <input id="youtube-tags" type="text" placeholder="f1, monaco, race results">
-          </label>
-          <label>Category
-            <select id="youtube-category">
-              <option value="">(default)</option>
-              <option value="17">Sports</option>
-              <option value="24">Entertainment</option>
-              <option value="20">Gaming</option>
-              <option value="25">News & Politics</option>
-              <option value="2">Autos & Vehicles</option>
-              <option value="22">People & Blogs</option>
-              <option value="23">Comedy</option>
-              <option value="27">Education</option>
-              <option value="28">Science & Technology</option>
-              <option value="10">Music</option>
-              <option value="19">Travel & Events</option>
-            </select>
-          </label>
-        </section>
       </div>
 
       <aside class="right">
@@ -94,6 +61,42 @@
       </aside>
     </div>
   </main>
+
+  <div id="options-holder" hidden>
+    <div id="youtube-options" class="platform-options">
+      <label>Playlist
+        <select id="youtube-playlist">
+          <option value="">(none)</option>
+        </select>
+      </label>
+      <label>Privacy
+        <select id="youtube-privacy">
+          <option value="public">Public</option>
+          <option value="unlisted">Unlisted</option>
+          <option value="private">Private</option>
+        </select>
+      </label>
+      <label>Tags (comma separated)
+        <input id="youtube-tags" type="text" placeholder="f1, monaco, race results">
+      </label>
+      <label>Category
+        <select id="youtube-category">
+          <option value="">(default)</option>
+          <option value="17">Sports</option>
+          <option value="24">Entertainment</option>
+          <option value="20">Gaming</option>
+          <option value="25">News & Politics</option>
+          <option value="2">Autos & Vehicles</option>
+          <option value="22">People & Blogs</option>
+          <option value="23">Comedy</option>
+          <option value="27">Education</option>
+          <option value="28">Science & Technology</option>
+          <option value="10">Music</option>
+          <option value="19">Travel & Events</option>
+        </select>
+      </label>
+    </div>
+  </div>
 
   <div id="settings-overlay" class="overlay" hidden>
     <div class="modal">

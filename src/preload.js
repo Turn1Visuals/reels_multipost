@@ -5,6 +5,8 @@ contextBridge.exposeInMainWorld('api', {
   getPlatforms: () => ipcRenderer.invoke('get-platforms'),
   postVideo: (payload) => ipcRenderer.invoke('post-video', payload),
   getSettings: () => ipcRenderer.invoke('get-settings'),
+  getPrefs: () => ipcRenderer.invoke('get-prefs'),
+  savePrefs: (prefs) => ipcRenderer.invoke('save-prefs', prefs),
   saveSettings: (settings) => ipcRenderer.invoke('save-settings', settings),
   openExternal: (url) => ipcRenderer.invoke('open-external', url),
   readFile: (path) => ipcRenderer.invoke('read-file', path),

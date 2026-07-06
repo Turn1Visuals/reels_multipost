@@ -9,6 +9,30 @@ const postButton = document.getElementById('post')
 const statusCard = document.getElementById('status-card')
 const statusList = document.getElementById('status-list')
 
+let savedPrefs = {}
+
+function prefFields() {
+  return document.querySelectorAll('.platform-options input, .platform-options select')
+}
+
+async function restorePrefs() {
+  savedPrefs = await window.api.getPrefs()
+  for (const el of prefFields()) {
+    if (el.id && savedPrefs[el.id] !== undefined) el.value = savedPrefs[el.id]
+  }
+  for (const el of prefFields()) {
+    el.addEventListener('change', storePrefs)
+  }
+}
+
+function storePrefs() {
+  savedPrefs = {}
+  for (const el of prefFields()) {
+    if (el.id) savedPrefs[el.id] = el.value
+  }
+  window.api.savePrefs(savedPrefs)
+}
+
 async function loadPlaylists() {
   const select = document.getElementById('youtube-playlist')
   const playlists = await window.api.getYoutubePlaylists()
@@ -20,11 +44,17 @@ async function loadPlaylists() {
     option.textContent = p.title
     select.appendChild(option)
   }
-  select.value = current
+  // fall back to the remembered playlist when the list arrives after restorePrefs
+  select.value = current || savedPrefs['youtube-playlist'] || ''
 }
 
 async function loadPlatforms() {
   const platforms = await window.api.getPlatforms()
+  const holder = document.getElementById('options-holder')
+  // park platform option panels so clearing the list doesn't destroy them
+  for (const panel of platformsContainer.querySelectorAll('.platform-options')) {
+    holder.appendChild(panel)
+  }
   platformsContainer.innerHTML = ''
   for (const p of platforms) {
     const label = document.createElement('label')
@@ -44,6 +74,15 @@ async function loadPlatforms() {
       label.appendChild(badge)
     }
     platformsContainer.appendChild(label)
+
+    const options = document.getElementById(p.id + '-options')
+    if (options) {
+      platformsContainer.appendChild(options)
+      options.hidden = !checkbox.checked
+      checkbox.addEventListener('change', () => {
+        options.hidden = !checkbox.checked
+      })
+    }
   }
   updatePostButton()
 }
@@ -56,7 +95,7 @@ function updatePostButton() {
   postButton.disabled = !videoPath || selectedPlatforms().length === 0
 }
 
-const thumbRow = document.getElementById('thumb-row')
+const captureButton = document.getElementById('capture-frame')
 const thumbPreviewWrap = document.getElementById('thumb-preview-wrap')
 const thumbPreview = document.getElementById('thumb-preview')
 
@@ -70,7 +109,7 @@ selectButton.addEventListener('click', async () => {
   if (videoPreview.src) URL.revokeObjectURL(videoPreview.src)
   videoPreview.src = URL.createObjectURL(new Blob([data], { type: 'video/mp4' }))
   videoPreview.hidden = false
-  thumbRow.hidden = false
+  captureButton.hidden = false
   clearThumbnail()
   updatePostButton()
 })
@@ -81,7 +120,7 @@ function clearThumbnail() {
   thumbPreviewWrap.hidden = true
 }
 
-document.getElementById('capture-frame').addEventListener('click', () => {
+captureButton.addEventListener('click', () => {
   const canvas = document.createElement('canvas')
   canvas.width = videoPreview.videoWidth
   canvas.height = videoPreview.videoHeight
@@ -172,8 +211,6 @@ document.getElementById('save-settings').addEventListener('click', async () => {
   loadPlatforms()
 })
 
-loadPlaylists()
-
 window.api.onPostProgress(({ platformId, status, error, result }) => {
   const li = document.getElementById('status-' + platformId)
   if (!li) return
@@ -198,4 +235,8 @@ window.api.onPostProgress(({ platformId, status, error, result }) => {
   }
 })
 
-loadPlatforms()
+;(async () => {
+  await loadPlatforms()
+  await restorePrefs()
+  await loadPlaylists()
+})()
