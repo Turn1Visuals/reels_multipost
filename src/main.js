@@ -120,7 +120,7 @@ ipcMain.handle('save-settings', (event, newSettings) => {
 ipcMain.handle('post-video', async (event, payload) => {
   const { platformIds, videoPath, meta } = payload
   const results = {}
-  for (const id of platformIds) {
+  await Promise.all(platformIds.map(async (id) => {
     const platform = platforms.get(id)
     win.webContents.send('post-progress', { platformId: id, status: 'posting' })
     try {
@@ -134,6 +134,6 @@ ipcMain.handle('post-video', async (event, payload) => {
       results[id] = { ok: false, error: err.message }
       win.webContents.send('post-progress', { platformId: id, status: 'error', error: err.message })
     }
-  }
+  }))
   return results
 })
