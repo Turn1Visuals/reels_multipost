@@ -179,7 +179,7 @@ module.exports = {
       }
       initUrl = 'https://open.tiktokapis.com/v2/post/publish/video/init/'
       body.post_info = {
-        title: [meta.caption, meta.hashtags].filter(Boolean).join('\n\n'),
+        title: [meta.title, meta.caption, meta.hashtags].filter(Boolean).join('\n\n'),
         privacy_level: privacy,
         disable_comment: !!meta.tiktokDisableComment,
         disable_duet: !!meta.tiktokDisableDuet,

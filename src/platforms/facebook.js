@@ -43,11 +43,11 @@ module.exports = {
     const upload = await uploadRes.json()
     if (!upload.success) throw new Error('Facebook upload failed: ' + JSON.stringify(upload))
 
-    const description = [meta.caption, meta.hashtags].filter(Boolean).join('\n\n')
+    const description = [meta.title, meta.caption, meta.hashtags].filter(Boolean).join('\n\n')
     await metaAuth.graphPost('/' + saved.page.id + '/video_reels', {
       upload_phase: 'finish',
       video_id: start.video_id,
-      video_state: 'PUBLISHED',
+      video_state: meta.facebookState === 'draft' ? 'DRAFT' : 'PUBLISHED',
       description,
       access_token: pageToken
     })

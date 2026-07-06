@@ -176,6 +176,7 @@ postButton.addEventListener('click', async () => {
       tiktokDisableComment: document.getElementById('tiktok-disable-comment').checked,
       tiktokDisableDuet: document.getElementById('tiktok-disable-duet').checked,
       tiktokDisableStitch: document.getElementById('tiktok-disable-stitch').checked,
+      facebookState: document.getElementById('facebook-state').value,
       youtubePlaylistId: document.getElementById('youtube-playlist').value,
       youtubePrivacy: document.getElementById('youtube-privacy').value,
       youtubeTags: document.getElementById('youtube-tags').value.trim(),
