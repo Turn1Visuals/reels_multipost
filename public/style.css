@@ -258,3 +258,10 @@ button:disabled {
   color: #bdc1c6;
   margin-bottom: 8px;
 }
+
+.connect-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}

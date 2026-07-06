@@ -124,6 +124,28 @@ postButton.addEventListener('click', async () => {
 
 const settingsOverlay = document.getElementById('settings-overlay')
 
+const youtubeConnectionLabel = document.getElementById('youtube-connection')
+
+async function refreshYoutubeConnection() {
+  const info = await window.api.youtubeConnection()
+  youtubeConnectionLabel.textContent = info.connected ? 'connected: ' + info.channel : 'not connected'
+  youtubeConnectionLabel.className = info.connected ? 'status-done' : 'muted'
+}
+
+document.getElementById('youtube-connect').addEventListener('click', async () => {
+  youtubeConnectionLabel.textContent = 'waiting for browser login…'
+  youtubeConnectionLabel.className = 'muted'
+  try {
+    const info = await window.api.youtubeConnect()
+    youtubeConnectionLabel.textContent = 'connected: ' + info.channel
+    youtubeConnectionLabel.className = 'status-done'
+    loadPlaylists()
+  } catch (err) {
+    youtubeConnectionLabel.textContent = 'connection failed'
+    youtubeConnectionLabel.className = 'status-error'
+  }
+})
+
 document.getElementById('open-settings').addEventListener('click', async () => {
   const settings = await window.api.getSettings()
   for (const input of settingsOverlay.querySelectorAll('[data-setting]')) {
@@ -131,6 +153,7 @@ document.getElementById('open-settings').addEventListener('click', async () => {
     input.value = (settings[section] && settings[section][key]) || ''
   }
   settingsOverlay.hidden = false
+  refreshYoutubeConnection()
 })
 
 document.getElementById('close-settings').addEventListener('click', () => {

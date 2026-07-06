@@ -9,5 +9,7 @@ contextBridge.exposeInMainWorld('api', {
   openExternal: (url) => ipcRenderer.invoke('open-external', url),
   readFile: (path) => ipcRenderer.invoke('read-file', path),
   getYoutubePlaylists: () => ipcRenderer.invoke('get-youtube-playlists'),
+  youtubeConnect: () => ipcRenderer.invoke('youtube-connect'),
+  youtubeConnection: () => ipcRenderer.invoke('youtube-connection'),
   onPostProgress: (callback) => ipcRenderer.on('post-progress', (event, data) => callback(data))
 })

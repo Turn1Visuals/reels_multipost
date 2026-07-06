@@ -69,6 +69,27 @@ module.exports = {
   id: 'youtube',
   name: 'YouTube',
   isConfigured: () => credentials.forPlatform('youtube') !== null,
+  // Runs the browser consent flow if needed, returns the connected channel name
+  connect: async () => {
+    const auth = await getAuthedClient()
+    const youtube = google.youtube({ version: 'v3', auth })
+    const res = await youtube.channels.list({ part: ['snippet'], mine: true })
+    return { channel: res.data.items[0] ? res.data.items[0].snippet.title : 'unknown channel' }
+  },
+  // Passive check — never opens the browser
+  getConnection: async () => {
+    const creds = credentials.forPlatform('youtube')
+    const saved = tokens.load('youtube')
+    if (!creds || !saved || !saved.refresh_token) return { connected: false }
+    try {
+      const auth = await getAuthedClient()
+      const youtube = google.youtube({ version: 'v3', auth })
+      const res = await youtube.channels.list({ part: ['snippet'], mine: true })
+      return { connected: true, channel: res.data.items[0] ? res.data.items[0].snippet.title : 'unknown channel' }
+    } catch (err) {
+      return { connected: false }
+    }
+  },
   // Only lists when already logged in — must not pop the consent browser on app start
   listPlaylists: async () => {
     const creds = credentials.forPlatform('youtube')
