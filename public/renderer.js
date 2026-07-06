@@ -232,8 +232,16 @@ function wireConnect(platformId, onChange) {
 
 const connectionRefreshers = [
   wireConnect('youtube', loadPlaylists),
-  wireConnect('tiktok')
+  wireConnect('tiktok'),
+  wireConnect('instagram', refreshMetaConnections),
+  wireConnect('facebook', refreshMetaConnections)
 ]
+
+// Instagram and Facebook share one Facebook login — connecting either connects both
+function refreshMetaConnections() {
+  connectionRefreshers[2]()
+  connectionRefreshers[3]()
+}
 
 for (const button of document.querySelectorAll('.toggle-credentials')) {
   button.addEventListener('click', () => {

@@ -82,7 +82,10 @@ ipcMain.handle('get-youtube-playlists', () => platforms.get('youtube').listPlayl
 
 ipcMain.handle('platform-connect', (event, id) => platforms.get(id).connect())
 
-ipcMain.handle('platform-disconnect', (event, id) => tokens.remove(id))
+// Instagram and Facebook share the Meta token file
+const tokenKeyFor = { instagram: 'meta', facebook: 'meta' }
+
+ipcMain.handle('platform-disconnect', (event, id) => tokens.remove(tokenKeyFor[id] || id))
 
 ipcMain.handle('platform-connection', (event, id) => {
   const platform = platforms.get(id)
