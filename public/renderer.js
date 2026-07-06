@@ -1,5 +1,6 @@
 let videoPath = null
 let thumbnailDataUrl = null
+let thumbnailTimeMs = null
 
 const selectButton = document.getElementById('select-video')
 const videoName = document.getElementById('video-name')
@@ -18,7 +19,9 @@ function prefFields() {
 async function restorePrefs() {
   savedPrefs = await window.api.getPrefs()
   for (const el of prefFields()) {
-    if (el.id && savedPrefs[el.id] !== undefined) el.value = savedPrefs[el.id]
+    if (!el.id || savedPrefs[el.id] === undefined) continue
+    if (el.type === 'checkbox') el.checked = savedPrefs[el.id]
+    else el.value = savedPrefs[el.id]
   }
   for (const el of prefFields()) {
     el.addEventListener('change', storePrefs)
@@ -28,7 +31,7 @@ async function restorePrefs() {
 function storePrefs() {
   savedPrefs = {}
   for (const el of prefFields()) {
-    if (el.id) savedPrefs[el.id] = el.value
+    if (el.id) savedPrefs[el.id] = el.type === 'checkbox' ? el.checked : el.value
   }
   window.api.savePrefs(savedPrefs)
 }
@@ -116,6 +119,7 @@ selectButton.addEventListener('click', async () => {
 
 function clearThumbnail() {
   thumbnailDataUrl = null
+  thumbnailTimeMs = null
   thumbPreview.src = ''
   thumbPreviewWrap.hidden = true
 }
@@ -126,6 +130,7 @@ captureButton.addEventListener('click', () => {
   canvas.height = videoPreview.videoHeight
   canvas.getContext('2d').drawImage(videoPreview, 0, 0)
   thumbnailDataUrl = canvas.toDataURL('image/jpeg', 0.9)
+  thumbnailTimeMs = Math.round(videoPreview.currentTime * 1000)
   thumbPreview.src = thumbnailDataUrl
   thumbPreviewWrap.hidden = false
 })
@@ -151,6 +156,12 @@ postButton.addEventListener('click', async () => {
       caption: document.getElementById('caption').value.trim(),
       hashtags: document.getElementById('hashtags').value.trim(),
       thumbnailDataUrl,
+      thumbnailTimeMs,
+      tiktokMode: document.getElementById('tiktok-mode').value,
+      tiktokPrivacy: document.getElementById('tiktok-privacy').value,
+      tiktokDisableComment: document.getElementById('tiktok-disable-comment').checked,
+      tiktokDisableDuet: document.getElementById('tiktok-disable-duet').checked,
+      tiktokDisableStitch: document.getElementById('tiktok-disable-stitch').checked,
       youtubePlaylistId: document.getElementById('youtube-playlist').value,
       youtubePrivacy: document.getElementById('youtube-privacy').value,
       youtubeTags: document.getElementById('youtube-tags').value.trim(),

@@ -6,7 +6,7 @@ const crypto = require('crypto')
 const credentials = require('./credentials')
 const tokens = require('../tokens')
 
-const SCOPES = 'user.info.basic,video.upload'
+const SCOPES = 'user.info.basic,video.upload,video.publish'
 // Fixed port: TikTok requires the exact redirect URI (incl. port) to be registered in the developer portal
 const PORT = 8712
 const REDIRECT_URI = `http://127.0.0.1:${PORT}/callback`
@@ -105,6 +105,16 @@ async function fetchDisplayName(accessToken) {
   return data.data.user.display_name
 }
 
+async function fetchCreatorInfo(accessToken) {
+  const res = await fetch('https://open.tiktokapis.com/v2/post/publish/creator_info/query/', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + accessToken, 'Content-Type': 'application/json' }
+  })
+  const data = await res.json()
+  if (data.error && data.error.code !== 'ok') throw new Error(data.error.message || data.error.code)
+  return data.data
+}
+
 async function fetchPublishStatus(accessToken, publishId) {
   const res = await fetch('https://open.tiktokapis.com/v2/post/publish/status/fetch/', {
     method: 'POST',
@@ -139,9 +149,11 @@ module.exports = {
       return { connected: false }
     }
   },
-  // Inbox (draft) upload: the video lands in the TikTok app inbox, caption/title are added there
-  post: async ({ videoPath }) => {
+  // Draft mode: video lands in the TikTok app inbox, caption is added there.
+  // Direct mode: posts straight to the profile with caption; unaudited clients only get SELF_ONLY privacy.
+  post: async ({ videoPath, meta }) => {
     const accessToken = await getAccessToken()
+    const direct = meta.tiktokMode === 'direct'
     const buffer = fs.readFileSync(videoPath)
     const mimeType = { '.mov': 'video/quicktime', '.webm': 'video/webm' }[path.extname(videoPath).toLowerCase()] || 'video/mp4'
 
@@ -149,17 +161,37 @@ module.exports = {
     const chunkSize = buffer.length <= 64 * 1024 * 1024 ? buffer.length : 32 * 1024 * 1024
     const totalChunks = Math.floor(buffer.length / chunkSize) || 1
 
-    const initRes = await fetch('https://open.tiktokapis.com/v2/post/publish/inbox/video/init/', {
+    const body = {
+      source_info: {
+        source: 'FILE_UPLOAD',
+        video_size: buffer.length,
+        chunk_size: chunkSize,
+        total_chunk_count: totalChunks
+      }
+    }
+
+    let initUrl = 'https://open.tiktokapis.com/v2/post/publish/inbox/video/init/'
+    if (direct) {
+      const creator = await fetchCreatorInfo(accessToken)
+      const privacy = meta.tiktokPrivacy || 'SELF_ONLY'
+      if (!creator.privacy_level_options.includes(privacy)) {
+        throw new Error('privacy "' + privacy + '" not allowed for this account — allowed: ' + creator.privacy_level_options.join(', '))
+      }
+      initUrl = 'https://open.tiktokapis.com/v2/post/publish/video/init/'
+      body.post_info = {
+        title: [meta.caption, meta.hashtags].filter(Boolean).join('\n\n'),
+        privacy_level: privacy,
+        disable_comment: !!meta.tiktokDisableComment,
+        disable_duet: !!meta.tiktokDisableDuet,
+        disable_stitch: !!meta.tiktokDisableStitch
+      }
+      if (meta.thumbnailTimeMs) body.post_info.video_cover_timestamp_ms = meta.thumbnailTimeMs
+    }
+
+    const initRes = await fetch(initUrl, {
       method: 'POST',
       headers: { Authorization: 'Bearer ' + accessToken, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        source_info: {
-          source: 'FILE_UPLOAD',
-          video_size: buffer.length,
-          chunk_size: chunkSize,
-          total_chunk_count: totalChunks
-        }
-      })
+      body: JSON.stringify(body)
     })
     const init = await initRes.json()
     if (init.error && init.error.code !== 'ok') throw new Error('TikTok init failed: ' + (init.error.message || init.error.code))
@@ -178,14 +210,22 @@ module.exports = {
       if (!uploadRes.ok) throw new Error('TikTok upload failed: HTTP ' + uploadRes.status)
     }
 
+    const doneStatus = direct ? 'PUBLISH_COMPLETE' : 'SEND_TO_USER_INBOX'
     const result = { publishId: init.data.publish_id }
     for (let attempt = 0; attempt < 15; attempt++) {
       const status = await fetchPublishStatus(accessToken, init.data.publish_id)
-      if (status.status === 'SEND_TO_USER_INBOX') return result
+      if (status.status === doneStatus) {
+        // TikTok's API really does spell it "publicaly"
+        const postId = status.publicaly_available_post_id && status.publicaly_available_post_id[0]
+        if (postId) result.url = 'https://www.tiktok.com/@/video/' + postId
+        return result
+      }
       if (status.status === 'FAILED') throw new Error('TikTok rejected the video: ' + (status.fail_reason || 'unknown reason'))
       await new Promise((r) => setTimeout(r, 2000))
     }
-    result.warning = 'upload accepted but still processing — check your TikTok inbox in a bit'
+    result.warning = direct
+      ? 'upload accepted but still processing — check your TikTok profile in a bit'
+      : 'upload accepted but still processing — check your TikTok inbox in a bit'
     return result
   }
 }
