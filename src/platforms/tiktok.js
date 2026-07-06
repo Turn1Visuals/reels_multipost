@@ -151,7 +151,7 @@ module.exports = {
   },
   // Draft mode: video lands in the TikTok app inbox, caption is added there.
   // Direct mode: posts straight to the profile with caption; unaudited clients only get SELF_ONLY privacy.
-  post: async ({ videoPath, meta }) => {
+  post: async ({ videoPath, meta, onProgress = () => {} }) => {
     const accessToken = await getAccessToken()
     const direct = meta.tiktokMode === 'direct'
     const buffer = fs.readFileSync(videoPath)
@@ -196,6 +196,7 @@ module.exports = {
     const init = await initRes.json()
     if (init.error && init.error.code !== 'ok') throw new Error('TikTok init failed: ' + (init.error.message || init.error.code))
 
+    onProgress('uploading…')
     for (let i = 0; i < totalChunks; i++) {
       const start = i * chunkSize
       const end = i === totalChunks - 1 ? buffer.length : start + chunkSize
@@ -210,6 +211,7 @@ module.exports = {
       if (!uploadRes.ok) throw new Error('TikTok upload failed: HTTP ' + uploadRes.status)
     }
 
+    onProgress('waiting for TikTok…')
     const doneStatus = direct ? 'PUBLISH_COMPLETE' : 'SEND_TO_USER_INBOX'
     const result = { publishId: init.data.publish_id }
     for (let attempt = 0; attempt < 15; attempt++) {

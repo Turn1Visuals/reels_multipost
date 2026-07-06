@@ -281,11 +281,11 @@ document.getElementById('save-settings').addEventListener('click', async () => {
   loadPlatforms()
 })
 
-window.api.onPostProgress(({ platformId, status, error, result }) => {
+window.api.onPostProgress(({ platformId, status, error, result, detail }) => {
   const li = document.getElementById('status-' + platformId)
   if (!li) return
   li.className = 'status-' + status
-  if (status === 'posting') li.textContent = platformId + ': posting…'
+  if (status === 'posting') li.textContent = platformId + ': ' + (detail || 'posting…')
   if (status === 'error') li.textContent = platformId + ': ✗ ' + error
   if (status === 'done') {
     li.textContent = platformId + ': ✓ posted '

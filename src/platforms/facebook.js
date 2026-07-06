@@ -21,7 +21,7 @@ module.exports = {
     }
   },
   // Publishes a Reel to the page: start -> binary upload -> finish (+ thumbnail attempt)
-  post: async ({ videoPath, meta }) => {
+  post: async ({ videoPath, meta, onProgress = () => {} }) => {
     const saved = await metaAuth.connect()
     const pageToken = saved.page.token
     const buffer = fs.readFileSync(videoPath)
@@ -30,6 +30,7 @@ module.exports = {
       upload_phase: 'start',
       access_token: pageToken
     })
+    onProgress('uploading…')
 
     const uploadRes = await fetch(start.upload_url, {
       method: 'POST',
@@ -43,6 +44,7 @@ module.exports = {
     const upload = await uploadRes.json()
     if (!upload.success) throw new Error('Facebook upload failed: ' + JSON.stringify(upload))
 
+    onProgress('publishing…')
     const description = [meta.title, meta.caption, meta.hashtags].filter(Boolean).join('\n\n')
     await metaAuth.graphPost('/' + saved.page.id + '/video_reels', {
       upload_phase: 'finish',

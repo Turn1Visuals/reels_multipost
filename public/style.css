@@ -340,6 +340,11 @@ button:disabled {
   white-space: nowrap;
 }
 
+.note {
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
 .toggle-credentials {
   font-size: 12px;
   padding: 4px 10px;

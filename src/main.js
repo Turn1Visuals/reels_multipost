@@ -124,7 +124,10 @@ ipcMain.handle('post-video', async (event, payload) => {
     const platform = platforms.get(id)
     win.webContents.send('post-progress', { platformId: id, status: 'posting' })
     try {
-      const result = await platform.post({ videoPath, meta })
+      const onProgress = (detail) => {
+        win.webContents.send('post-progress', { platformId: id, status: 'posting', detail })
+      }
+      const result = await platform.post({ videoPath, meta, onProgress })
       results[id] = { ok: true, ...result }
       win.webContents.send('post-progress', { platformId: id, status: 'done', result: results[id] })
     } catch (err) {
