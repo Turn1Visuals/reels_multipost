@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Reels Multipost</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <div class="header">
+      <h1>Reels Multipost</h1>
+      <button id="open-settings" title="Settings">⚙</button>
+    </div>
+
+    <div class="layout">
+      <div class="left">
+        <section class="card">
+          <h2>Video</h2>
+          <div class="video-row">
+            <button id="select-video">Select video…</button>
+            <span id="video-name" class="muted">No video selected</span>
+          </div>
+          <video id="video-preview" controls hidden></video>
+        </section>
+
+        <section class="card">
+          <h2>Details</h2>
+          <label>Title
+            <input id="title" type="text" placeholder="Monaco GP — Race Results">
+          </label>
+          <label>Caption
+            <textarea id="caption" rows="4" placeholder="Full race results from Monaco…"></textarea>
+          </label>
+          <label>Hashtags
+            <input id="hashtags" type="text" placeholder="#f1 #monacogp #formula1">
+          </label>
+        </section>
+      </div>
+
+      <aside class="right">
+        <section class="card">
+          <h2>Platforms</h2>
+          <div id="platforms" class="platforms"></div>
+        </section>
+
+        <button id="post" class="post-button" disabled>Post</button>
+
+        <section class="card" id="status-card" hidden>
+          <h2>Status</h2>
+          <ul id="status-list"></ul>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <div id="settings-overlay" class="overlay" hidden>
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Settings</h2>
+        <button id="close-settings">✕</button>
+      </div>
+
+      <section>
+        <h3>YouTube</h3>
+        <label>Client ID
+          <input data-setting="youtube.clientId" type="text">
+        </label>
+        <label>Client secret
+          <input data-setting="youtube.clientSecret" type="password">
+        </label>
+      </section>
+
+      <section>
+        <h3>TikTok</h3>
+        <label>Client key
+          <input data-setting="tiktok.clientKey" type="text">
+        </label>
+        <label>Client secret
+          <input data-setting="tiktok.clientSecret" type="password">
+        </label>
+      </section>
+
+      <section>
+        <h3>Meta (Instagram + Facebook)</h3>
+        <label>App ID
+          <input data-setting="meta.appId" type="text">
+        </label>
+        <label>App secret
+          <input data-setting="meta.appSecret" type="password">
+        </label>
+      </section>
+
+      <section>
+        <h3>X</h3>
+        <label>API key
+          <input data-setting="x.apiKey" type="text">
+        </label>
+        <label>API secret
+          <input data-setting="x.apiSecret" type="password">
+        </label>
+      </section>
+
+      <button id="save-settings" class="post-button">Save</button>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
