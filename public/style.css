@@ -63,6 +63,12 @@ h2 {
   margin-bottom: 12px;
 }
 
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
 .card {
   background: #1e2126;
   border: 1px solid #2c3038;

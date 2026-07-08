@@ -2,6 +2,7 @@ const { contextBridge, ipcRenderer } = require('electron')
 
 contextBridge.exposeInMainWorld('api', {
   selectVideo: () => ipcRenderer.invoke('select-video'),
+  selectPostJson: () => ipcRenderer.invoke('select-post-json'),
   getPlatforms: () => ipcRenderer.invoke('get-platforms'),
   postVideo: (payload) => ipcRenderer.invoke('post-video', payload),
   getSettings: () => ipcRenderer.invoke('get-settings'),

@@ -131,6 +131,22 @@ selectButton.addEventListener('click', async () => {
   updatePostButton()
 })
 
+document.getElementById('load-json').addEventListener('click', async () => {
+  let data
+  try {
+    data = await window.api.selectPostJson()
+  } catch (err) {
+    alert('Could not read JSON: ' + err.message)
+    return
+  }
+  if (!data) return
+  for (const el of formFields()) {
+    if (!el.id || data[el.id] === undefined) continue
+    if (el.type === 'checkbox') el.checked = data[el.id]
+    else el.value = data[el.id]
+  }
+})
+
 function clearThumbnail() {
   thumbnailDataUrl = null
   thumbnailTimeMs = null

@@ -78,6 +78,16 @@ ipcMain.handle('select-video', async () => {
   return result.filePaths[0]
 })
 
+ipcMain.handle('select-post-json', async () => {
+  const result = await dialog.showOpenDialog(win, {
+    title: 'Load post details',
+    filters: [{ name: 'JSON', extensions: ['json'] }],
+    properties: ['openFile']
+  })
+  if (result.canceled || result.filePaths.length === 0) return null
+  return JSON.parse(fs.readFileSync(result.filePaths[0], 'utf8').replace(/^﻿/, ''))
+})
+
 ipcMain.handle('get-youtube-playlists', () => platforms.get('youtube').listPlaylists())
 
 ipcMain.handle('platform-connect', (event, id) => platforms.get(id).connect())
