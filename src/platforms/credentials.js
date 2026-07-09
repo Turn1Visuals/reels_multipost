@@ -6,7 +6,8 @@ const sectionForPlatform = {
   tiktok: 'tiktok',
   instagram: 'meta',
   facebook: 'meta',
-  x: 'x'
+  x: 'x',
+  whatsapp: 'whatsapp'
 }
 
 function forPlatform(id) {
