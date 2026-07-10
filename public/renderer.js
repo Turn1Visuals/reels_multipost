@@ -31,10 +31,16 @@ function applyPreset(name) {
   const preset = presetsData.presets[name]
   if (!preset) return
   appliedFields = preset.fields
+  // A preset defines the whole form, so fields it doesn't cover (e.g. options added
+  // after the preset was saved) are reset to their default rather than kept from a
+  // previously applied preset.
   for (const el of formFields()) {
-    if (!el.id || preset.fields[el.id] === undefined) continue
-    if (el.type === 'checkbox') el.checked = preset.fields[el.id]
-    else el.value = preset.fields[el.id]
+    if (!el.id) continue
+    const saved = preset.fields[el.id]
+    if (el.type === 'checkbox') el.checked = saved === undefined ? false : saved
+    else if (saved !== undefined) el.value = saved
+    else if (el.tagName === 'SELECT') el.selectedIndex = 0
+    else el.value = ''
   }
   for (const checkbox of platformsContainer.querySelectorAll('input[type="checkbox"]')) {
     if (!checkbox.disabled) checkbox.checked = preset.platforms.includes(checkbox.value)
