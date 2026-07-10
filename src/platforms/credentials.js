@@ -8,6 +8,7 @@ const sectionForPlatform = {
   facebook: 'meta',
   x: 'x',
   mastodon: 'mastodon',
+  bluesky: 'bluesky',
   whatsapp: 'whatsapp'
 }
 

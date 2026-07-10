@@ -1,8 +1,8 @@
 # Reels Multipost
 
 A small Electron desktop app for posting short vertical videos (Shorts/Reels) to
-**YouTube, TikTok, Instagram, Facebook, X, Threads and Mastodon** from one window: pick
-a video, write the title/caption/hashtags once, tick the platforms, hit Post.
+**YouTube, TikTok, Instagram, Facebook, X, Threads, Mastodon and Bluesky** from one
+window: pick a video, write the title/caption/hashtags once, tick the platforms, hit Post.
 
 There's also a **WhatsApp (text only)** target that sends the caption to your own
 phone — handy for pasting into apps where captions don't carry over (e.g. finishing
@@ -55,6 +55,12 @@ static HTML/JS in `public/`.
   flow), direct multipart upload to `/api/v2/media` (no public URL/tunnel needed),
   poll while the video processes, then `POST /api/v1/statuses`. The captured frame
   is sent as the media `thumbnail`
+- **Bluesky** — AT Protocol with an app password. Login goes through the
+  `bsky.social` entryway, then the account's real PDS is read from the session
+  (so custom-domain handles work). Video runs through Bluesky's video service:
+  `getServiceAuth` → upload to `video.bsky.app` → poll the processing job for the
+  blob → `createRecord` a post embedding it. Hashtags are made clickable with
+  richtext facets (UTF-8 byte ranges)
 - **WhatsApp (text only)** — no API: opens WhatsApp Desktop through a
   `whatsapp://send` deep link with the caption pre-filled to your own chat, and you
   press Send. Because you send it manually in the real client, it stays clear of
@@ -81,6 +87,7 @@ own ceremony:
 | X | [X Developer Portal](https://developer.x.com) | App with **Read and write** permission; OAuth 1.0a API key + secret and access token + secret (all four pasted in settings) |
 | Threads | [Meta for Developers](https://developers.facebook.com) | Same app as Meta, with the **Access the Threads API** use case (`threads_basic` + `threads_content_publish`), redirect `https://localhost:8713/callback`, your Threads account added as a **Threads Tester** (and the invite accepted); paste the Threads app ID + secret in settings |
 | Mastodon | your instance's **Preferences → Development** | A new application with `read` + `write` scopes; paste its access token + your instance URL (e.g. `mastodon.social`) in settings |
+| Bluesky | **Settings → Privacy and Security → App Passwords** | An app password (`xxxx-xxxx-xxxx-xxxx`) + your handle (e.g. `you.bsky.social` or a custom domain); account email must be verified for video |
 | WhatsApp | — (no developer app) | WhatsApp Desktop installed and signed in; just your own phone number in international format (digits only, e.g. `31612345678`) |
 
 Notes from the trenches:
@@ -114,6 +121,11 @@ Notes from the trenches:
   its access token. Because it's decentralized, you also supply your **instance URL**.
   Default **500-char** limit and video size cap are per-instance settings. Custom video
   thumbnails **are** supported (unlike Threads/X).
+- **Bluesky**: app password (no OAuth flow), handle + password in settings. Custom
+  domain handles work — the app logs in via `bsky.social` and reads your real PDS from
+  the session. Video is capped at **60s / ~100 MB** and needs a **verified account
+  email**; text limit is **300 chars**. Hashtags are made clickable via richtext facets.
+  No custom video thumbnail (Bluesky auto-picks a frame), like Threads/X.
 - **WhatsApp**: it doesn't post anything — it just pops WhatsApp Desktop open with
   the caption ready, so you tap Send and copy it on your phone. Pairs well with the
   TikTok draft flow above (video's already in the draft; this gets you the caption).

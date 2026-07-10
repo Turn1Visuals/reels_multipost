@@ -308,6 +308,24 @@
       </section>
 
       <section>
+        <h3>Bluesky</h3>
+        <p class="muted note">Create an app password under Bluesky → Settings → Privacy and Security → App Passwords. Video needs a verified account email. Max 60s, ~100 MB.</p>
+        <button class="toggle-credentials">Show credentials</button>
+        <div class="credentials" hidden>
+          <label>Handle
+            <input data-setting="bluesky.handle" type="text" placeholder="turn1visuals.com">
+          </label>
+          <label>App password
+            <input data-setting="bluesky.appPassword" type="password" placeholder="xxxx-xxxx-xxxx-xxxx">
+          </label>
+        </div>
+        <div class="connect-row">
+          <button id="bluesky-connect">Connect account</button>
+          <span id="bluesky-connection" class="muted">not connected</span>
+        </div>
+      </section>
+
+      <section>
         <h3>WhatsApp (Phone)</h3>
         <p class="muted note">On post, opens WhatsApp Desktop with the caption pre-filled to your own chat — press Send to get it on your phone. Needs WhatsApp Desktop installed and signed in.</p>
         <label>Your phone number (international, e.g. 31612345678)
