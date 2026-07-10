@@ -21,19 +21,26 @@ function creds() {
   return section
 }
 
+function apiError(error) {
+  const parts = [error.error_user_msg || error.message]
+  const codes = [error.code, error.error_subcode].filter(Boolean).join('/')
+  if (codes) parts.push('[' + codes + ']')
+  return new Error('Threads API: ' + parts.join(' '))
+}
+
 async function graphGet(path, params) {
   const url = new URL(API + path)
   for (const [key, value] of Object.entries(params)) url.searchParams.set(key, value)
   const res = await fetch(url)
   const data = await res.json()
-  if (data.error) throw new Error('Threads API: ' + data.error.message)
+  if (data.error) throw apiError(data.error)
   return data
 }
 
 async function graphPost(path, params) {
   const res = await fetch(API + path, { method: 'POST', body: new URLSearchParams(params) })
   const data = await res.json()
-  if (data.error) throw new Error('Threads API: ' + data.error.message)
+  if (data.error) throw apiError(data.error)
   return data
 }
 
