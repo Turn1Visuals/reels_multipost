@@ -206,6 +206,19 @@ button:disabled {
   color: #f2994a;
 }
 
+/* Brand icons before platform names (main-page labels and settings headings) */
+.platform-icon {
+  width: 15px;
+  height: 15px;
+  fill: currentColor;
+  flex: 0 0 auto;
+}
+
+.modal h3 .platform-icon {
+  vertical-align: -2px;
+  margin-right: 6px;
+}
+
 .platform-options {
   margin: -2px 0 4px 12px;
   padding: 10px 12px 2px;
