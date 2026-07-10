@@ -144,3 +144,24 @@ Everything sensitive is stored per-user, outside the repo:
 
 Personal project, built for my own posting workflow (sports data videos).
 Expect sharp edges. Issues and ideas welcome, but no promises.
+
+## Ideas / stretch goals
+
+Not built yet — things I might add later:
+
+- **More per-post options** — expose extra platform settings the app doesn't use yet:
+  Mastodon visibility + content warnings, reply controls (Threads/Bluesky/X), scheduled
+  publishing (YouTube/Facebook), Instagram collaborators/location, and more.
+- **Manage posted content** — a history view with per-platform links, delete where the
+  API allows (YouTube, Facebook, X, Mastodon, Bluesky, Threads — not TikTok/Instagram),
+  and metadata edits on the few that support it (YouTube, Mastodon, Facebook).
+- **Per-platform caption overrides** — tailor title/caption/hashtags per platform instead
+  of one shared caption.
+- **Preflight checks + live character counters** — validate the video against each
+  platform's limits and flag over-limit captions *before* posting, rather than failing mid-upload.
+- **Scheduling / queue** and **retry just the failed platform** after a multi-post.
+- **Custom thumbnail image upload** (not only frame capture) and **alt text** for accessibility.
+- **Multiple accounts per platform** and a **desktop notification** when a post finishes.
+- **External trigger / headless mode** — a local, token-protected HTTP API so other apps
+  (e.g. the video generators) can trigger a post; the same seam that would become a server
+  API if this ever grows past a personal tool.
