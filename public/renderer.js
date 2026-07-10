@@ -83,6 +83,7 @@ async function loadPlatforms() {
     checkbox.disabled = !p.configured
     checkbox.addEventListener('change', updatePostButton)
     label.appendChild(checkbox)
+    label.insertAdjacentHTML('beforeend', iconSvg(p.id))
     label.appendChild(document.createTextNode(p.name))
     if (!p.configured) {
       const badge = document.createElement('span')
@@ -263,6 +264,12 @@ const connectionRefreshers = [
 function refreshMetaConnections() {
   connectionRefreshers[2]()
   connectionRefreshers[3]()
+}
+
+// Brand icons in front of each settings section heading (data-platform may list several)
+for (const section of document.querySelectorAll('section[data-platform]')) {
+  const svg = section.dataset.platform.split(' ').map(iconSvg).join('')
+  section.querySelector('h3').insertAdjacentHTML('afterbegin', svg)
 }
 
 for (const button of document.querySelectorAll('.toggle-credentials')) {

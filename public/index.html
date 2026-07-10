@@ -176,7 +176,7 @@
       </div>
 
       <div id="tab-accounts" class="tab-panel">
-      <section>
+      <section data-platform="youtube">
         <h3>YouTube</h3>
         <button class="toggle-credentials">Show credentials</button>
         <div class="credentials" hidden>
@@ -193,7 +193,7 @@
         </div>
       </section>
 
-      <section>
+      <section data-platform="tiktok">
         <h3>TikTok</h3>
         <button class="toggle-credentials">Show credentials</button>
         <div class="credentials" hidden>
@@ -210,7 +210,7 @@
         </div>
       </section>
 
-      <section>
+      <section data-platform="instagram facebook">
         <h3>Meta (Instagram + Facebook)</h3>
         <button class="toggle-credentials">Show credentials</button>
         <div class="credentials" hidden>
@@ -234,21 +234,7 @@
         </div>
       </section>
 
-      <section>
-        <h3>Tunnel (ngrok)</h3>
-        <p class="muted note">Used to serve videos to Instagram. Optional — without it the app uses Cloudflare quick tunnels.</p>
-        <button class="toggle-credentials">Show credentials</button>
-        <div class="credentials" hidden>
-          <label>Authtoken
-            <input data-setting="ngrok.authtoken" type="password">
-          </label>
-          <label>Static domain (optional)
-            <input data-setting="ngrok.domain" type="text" placeholder="your-name.ngrok-free.app">
-          </label>
-        </div>
-      </section>
-
-      <section>
+      <section data-platform="x">
         <h3>X</h3>
         <button class="toggle-credentials">Show credentials</button>
         <div class="credentials" hidden>
@@ -271,7 +257,7 @@
         </div>
       </section>
 
-      <section>
+      <section data-platform="threads">
         <h3>Threads</h3>
         <p class="muted note">On first connect the browser shows a certificate warning at localhost — click through once to finish login.</p>
         <button class="toggle-credentials">Show credentials</button>
@@ -289,7 +275,7 @@
         </div>
       </section>
 
-      <section>
+      <section data-platform="mastodon">
         <h3>Mastodon</h3>
         <p class="muted note">Create an app under your instance's Preferences → Development (scopes read + write), then paste the access token here.</p>
         <button class="toggle-credentials">Show credentials</button>
@@ -307,7 +293,7 @@
         </div>
       </section>
 
-      <section>
+      <section data-platform="bluesky">
         <h3>Bluesky</h3>
         <p class="muted note">Create an app password under Bluesky → Settings → Privacy and Security → App Passwords. Video needs a verified account email. Max 60s, ~100 MB.</p>
         <button class="toggle-credentials">Show credentials</button>
@@ -325,7 +311,7 @@
         </div>
       </section>
 
-      <section>
+      <section data-platform="whatsapp">
         <h3>WhatsApp (Phone)</h3>
         <p class="muted note">On post, opens WhatsApp Desktop with the caption pre-filled to your own chat — press Send to get it on your phone. Needs WhatsApp Desktop installed and signed in.</p>
         <label>Your phone number (international, e.g. 31612345678)
@@ -333,11 +319,26 @@
         </label>
       </section>
 
+      <section data-platform="ngrok">
+        <h3>Tunnel (ngrok)</h3>
+        <p class="muted note">Used to serve videos to Instagram. Optional — without it the app uses Cloudflare quick tunnels.</p>
+        <button class="toggle-credentials">Show credentials</button>
+        <div class="credentials" hidden>
+          <label>Authtoken
+            <input data-setting="ngrok.authtoken" type="password">
+          </label>
+          <label>Static domain (optional)
+            <input data-setting="ngrok.domain" type="text" placeholder="your-name.ngrok-free.app">
+          </label>
+        </div>
+      </section>
+
       <button id="save-settings" class="post-button">Save</button>
       </div>
     </div>
   </div>
 
+  <script src="icons.js"></script>
   <script src="renderer.js"></script>
 </body>
 </html>
