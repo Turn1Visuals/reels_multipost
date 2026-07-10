@@ -22,20 +22,35 @@ function creds() {
   return c
 }
 
-// Bluesky doesn't auto-link #hashtags — each one needs a richtext facet marking its
-// byte range (UTF-8 offsets, not string indices, so multibyte text stays correct).
-function hashtagFacets(text) {
+// Bluesky doesn't auto-link #hashtags or URLs — each one needs a richtext facet
+// marking its byte range (UTF-8 offsets, not string indices, so multibyte text stays
+// correct). One facet per hashtag (#tag) and per explicit http(s):// link.
+function facetFor(text, charStart, span, feature) {
+  const byteStart = Buffer.byteLength(text.slice(0, charStart), 'utf8')
+  return {
+    index: { byteStart, byteEnd: byteStart + Buffer.byteLength(span, 'utf8') },
+    features: [feature]
+  }
+}
+
+function richTextFacets(text) {
   const facets = []
-  const re = /(^|\s)(#[\p{L}\p{N}_]+)/gu
-  let match
-  while ((match = re.exec(text)) !== null) {
-    const hashtag = match[2]
-    const charStart = match.index + match[1].length
-    const byteStart = Buffer.byteLength(text.slice(0, charStart), 'utf8')
-    facets.push({
-      index: { byteStart, byteEnd: byteStart + Buffer.byteLength(hashtag, 'utf8') },
-      features: [{ $type: 'app.bsky.richtext.facet#tag', tag: hashtag.slice(1) }]
-    })
+  const tagRe = /(^|\s)(#[\p{L}\p{N}_]+)/gu
+  let m
+  while ((m = tagRe.exec(text)) !== null) {
+    facets.push(facetFor(text, m.index + m[1].length, m[2], {
+      $type: 'app.bsky.richtext.facet#tag',
+      tag: m[2].slice(1)
+    }))
+  }
+  const urlRe = /(^|\s)(https?:\/\/[^\s]+)/g
+  while ((m = urlRe.exec(text)) !== null) {
+    // drop trailing punctuation that isn't really part of the link
+    const url = m[2].replace(/[.,;:!?)\]}'"]+$/, '')
+    facets.push(facetFor(text, m.index + m[1].length, url, {
+      $type: 'app.bsky.richtext.facet#link',
+      uri: url
+    }))
   }
   return facets
 }
@@ -161,7 +176,7 @@ module.exports = {
       createdAt: new Date().toISOString(),
       embed: { $type: 'app.bsky.embed.video', video: blob }
     }
-    const facets = hashtagFacets(text)
+    const facets = richTextFacets(text)
     if (facets.length) record.facets = facets
     const created = await xrpc(s.pds, 'com.atproto.repo.createRecord', {
       method: 'POST',

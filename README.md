@@ -59,8 +59,8 @@ static HTML/JS in `public/`.
   `bsky.social` entryway, then the account's real PDS is read from the session
   (so custom-domain handles work). Video runs through Bluesky's video service:
   `getServiceAuth` → upload to `video.bsky.app` → poll the processing job for the
-  blob → `createRecord` a post embedding it. Hashtags are made clickable with
-  richtext facets (UTF-8 byte ranges)
+  blob → `createRecord` a post embedding it. Hashtags and links are made clickable
+  with richtext facets (UTF-8 byte ranges)
 - **WhatsApp (text only)** — no API: opens WhatsApp Desktop through a
   `whatsapp://send` deep link with the caption pre-filled to your own chat, and you
   press Send. Because you send it manually in the real client, it stays clear of
@@ -124,8 +124,8 @@ Notes from the trenches:
 - **Bluesky**: app password (no OAuth flow), handle + password in settings. Custom
   domain handles work — the app logs in via `bsky.social` and reads your real PDS from
   the session. Video is capped at **60s / ~100 MB** and needs a **verified account
-  email**; text limit is **300 chars**. Hashtags are made clickable via richtext facets.
-  No custom video thumbnail (Bluesky auto-picks a frame), like Threads/X.
+  email**; text limit is **300 chars**. Hashtags and links are made clickable via
+  richtext facets. No custom video thumbnail (Bluesky auto-picks a frame), like Threads/X.
 - **WhatsApp**: it doesn't post anything — it just pops WhatsApp Desktop open with
   the caption ready, so you tap Send and copy it on your phone. Pairs well with the
   TikTok draft flow above (video's already in the draft; this gets you the caption).
