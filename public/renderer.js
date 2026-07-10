@@ -252,7 +252,8 @@ const connectionRefreshers = [
   wireConnect('tiktok'),
   wireConnect('instagram', refreshMetaConnections),
   wireConnect('facebook', refreshMetaConnections),
-  wireConnect('x')
+  wireConnect('x'),
+  wireConnect('threads')
 ]
 
 // Instagram and Facebook share one Facebook login — connecting either connects both
