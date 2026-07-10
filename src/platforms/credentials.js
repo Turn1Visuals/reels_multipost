@@ -7,6 +7,7 @@ const sectionForPlatform = {
   instagram: 'meta',
   facebook: 'meta',
   x: 'x',
+  mastodon: 'mastodon',
   whatsapp: 'whatsapp'
 }
 

@@ -290,6 +290,24 @@
       </section>
 
       <section>
+        <h3>Mastodon</h3>
+        <p class="muted note">Create an app under your instance's Preferences → Development (scopes read + write), then paste the access token here.</p>
+        <button class="toggle-credentials">Show credentials</button>
+        <div class="credentials" hidden>
+          <label>Instance URL
+            <input data-setting="mastodon.instance" type="text" placeholder="mastodon.social">
+          </label>
+          <label>Access token
+            <input data-setting="mastodon.token" type="password">
+          </label>
+        </div>
+        <div class="connect-row">
+          <button id="mastodon-connect">Connect account</button>
+          <span id="mastodon-connection" class="muted">not connected</span>
+        </div>
+      </section>
+
+      <section>
         <h3>WhatsApp (Phone)</h3>
         <p class="muted note">On post, opens WhatsApp Desktop with the caption pre-filled to your own chat — press Send to get it on your phone. Needs WhatsApp Desktop installed and signed in.</p>
         <label>Your phone number (international, e.g. 31612345678)

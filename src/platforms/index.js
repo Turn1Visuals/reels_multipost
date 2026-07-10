@@ -4,9 +4,10 @@ const instagram = require('./instagram')
 const facebook = require('./facebook')
 const x = require('./x')
 const threads = require('./threads')
+const mastodon = require('./mastodon')
 const whatsapp = require('./whatsapp')
 
-const all = [youtube, tiktok, instagram, facebook, x, threads, whatsapp]
+const all = [youtube, tiktok, instagram, facebook, x, threads, mastodon, whatsapp]
 
 module.exports = {
   list: () => all,
