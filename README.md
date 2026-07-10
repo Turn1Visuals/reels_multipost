@@ -1,8 +1,8 @@
 # Reels Multipost
 
 A small Electron desktop app for posting short vertical videos (Shorts/Reels) to
-**YouTube, TikTok, Instagram, Facebook, X and Threads** from one window: pick a video,
-write the title/caption/hashtags once, tick the platforms, hit Post.
+**YouTube, TikTok, Instagram, Facebook, X, Threads and Mastodon** from one window: pick
+a video, write the title/caption/hashtags once, tick the platforms, hit Post.
 
 There's also a **WhatsApp (text only)** target that sends the caption to your own
 phone — handy for pasting into apps where captions don't carry over (e.g. finishing
@@ -51,6 +51,10 @@ static HTML/JS in `public/`.
   URL (served through the same tunnel), poll until processed, then publish.
   An optional topic is sent as `topic_tag`. No custom video thumbnail — the
   Threads API doesn't accept one, so Threads auto-picks a frame
+- **Mastodon** — simplest of all: a per-instance access token (no OAuth browser
+  flow), direct multipart upload to `/api/v2/media` (no public URL/tunnel needed),
+  poll while the video processes, then `POST /api/v1/statuses`. The captured frame
+  is sent as the media `thumbnail`
 - **WhatsApp (text only)** — no API: opens WhatsApp Desktop through a
   `whatsapp://send` deep link with the caption pre-filled to your own chat, and you
   press Send. Because you send it manually in the real client, it stays clear of
@@ -76,6 +80,7 @@ own ceremony:
 | Instagram hosting | [ngrok](https://ngrok.com) | Free account; either configure the ngrok agent on your machine or paste an authtoken in settings |
 | X | [X Developer Portal](https://developer.x.com) | App with **Read and write** permission; OAuth 1.0a API key + secret and access token + secret (all four pasted in settings) |
 | Threads | [Meta for Developers](https://developers.facebook.com) | Same app as Meta, with the **Access the Threads API** use case (`threads_basic` + `threads_content_publish`), redirect `https://localhost:8713/callback`, your Threads account added as a **Threads Tester** (and the invite accepted); paste the Threads app ID + secret in settings |
+| Mastodon | your instance's **Preferences → Development** | A new application with `read` + `write` scopes; paste its access token + your instance URL (e.g. `mastodon.social`) in settings |
 | WhatsApp | — (no developer app) | WhatsApp Desktop installed and signed in; just your own phone number in international format (digits only, e.g. `31612345678`) |
 
 Notes from the trenches:
@@ -104,6 +109,11 @@ Notes from the trenches:
   a competing topic — so when you set a Topic, the app **strips the `#` symbols** from
   the caption/hashtags (the words stay as plain text) and sends the topic as a proper
   tag instead. Leave the Topic empty and your hashtags post normally.
+- **Mastodon**: the easiest to set up — no developer portal, no OAuth flow. Create an
+  app in your instance's Preferences → Development with `read` + `write` scopes and copy
+  its access token. Because it's decentralized, you also supply your **instance URL**.
+  Default **500-char** limit and video size cap are per-instance settings. Custom video
+  thumbnails **are** supported (unlike Threads/X).
 - **WhatsApp**: it doesn't post anything — it just pops WhatsApp Desktop open with
   the caption ready, so you tap Send and copy it on your phone. Pairs well with the
   TikTok draft flow above (video's already in the draft; this gets you the caption).
