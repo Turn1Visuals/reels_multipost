@@ -49,7 +49,8 @@ static HTML/JS in `public/`.
   HTTPS, so the local callback server runs on a self-signed cert (one-time browser
   warning). Publishing mirrors Instagram: create a container from a public video
   URL (served through the same tunnel), poll until processed, then publish.
-  An optional topic is sent as `topic_tag`
+  An optional topic is sent as `topic_tag`. No custom video thumbnail — the
+  Threads API doesn't accept one, so Threads auto-picks a frame
 - **WhatsApp (text only)** — no API: opens WhatsApp Desktop through a
   `whatsapp://send` deep link with the caption pre-filled to your own chat, and you
   press Send. Because you send it manually in the real client, it stays clear of
