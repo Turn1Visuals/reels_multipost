@@ -255,7 +255,8 @@ const connectionRefreshers = [
   wireConnect('facebook', refreshMetaConnections),
   wireConnect('x'),
   wireConnect('threads'),
-  wireConnect('mastodon')
+  wireConnect('mastodon'),
+  wireConnect('bluesky')
 ]
 
 // Instagram and Facebook share one Facebook login — connecting either connects both
