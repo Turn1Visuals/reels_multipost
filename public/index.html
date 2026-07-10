@@ -138,6 +138,12 @@
         </select>
       </label>
     </div>
+    <div id="threads-options" class="platform-options">
+      <label>Topic tag (attached to the post, not shown in the text)
+        <input id="threads-topic" type="text" placeholder="formula1">
+      </label>
+      <p class="muted note">Threads allows one topic per post, so the # symbols are removed from the text when a topic is set (the words stay).</p>
+    </div>
   </div>
 
   <div id="preset-overlay" class="overlay" hidden>
@@ -262,6 +268,24 @@
         <div class="connect-row">
           <button id="x-connect">Connect account</button>
           <span id="x-connection" class="muted">not connected</span>
+        </div>
+      </section>
+
+      <section>
+        <h3>Threads</h3>
+        <p class="muted note">On first connect the browser shows a certificate warning at localhost — click through once to finish login.</p>
+        <button class="toggle-credentials">Show credentials</button>
+        <div class="credentials" hidden>
+          <label>App ID
+            <input data-setting="threads.appId" type="text">
+          </label>
+          <label>App secret
+            <input data-setting="threads.appSecret" type="password">
+          </label>
+        </div>
+        <div class="connect-row">
+          <button id="threads-connect">Connect account</button>
+          <span id="threads-connection" class="muted">not connected</span>
         </div>
       </section>
 

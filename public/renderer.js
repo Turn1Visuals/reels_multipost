@@ -196,7 +196,8 @@ postButton.addEventListener('click', async () => {
       youtubePlaylistId: document.getElementById('youtube-playlist').value,
       youtubePrivacy: document.getElementById('youtube-privacy').value,
       youtubeTags: document.getElementById('youtube-tags').value.trim(),
-      youtubeCategoryId: document.getElementById('youtube-category').value
+      youtubeCategoryId: document.getElementById('youtube-category').value,
+      threadsTopic: document.getElementById('threads-topic').value.trim()
     }
   })
   postButton.disabled = false
@@ -252,7 +253,8 @@ const connectionRefreshers = [
   wireConnect('tiktok'),
   wireConnect('instagram', refreshMetaConnections),
   wireConnect('facebook', refreshMetaConnections),
-  wireConnect('x')
+  wireConnect('x'),
+  wireConnect('threads')
 ]
 
 // Instagram and Facebook share one Facebook login — connecting either connects both

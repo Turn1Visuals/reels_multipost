@@ -1,8 +1,8 @@
 # Reels Multipost
 
 A small Electron desktop app for posting short vertical videos (Shorts/Reels) to
-**YouTube, TikTok, Instagram, Facebook and X** from one window: pick a video, write the
-title/caption/hashtags once, tick the platforms, hit Post.
+**YouTube, TikTok, Instagram, Facebook, X and Threads** from one window: pick a video,
+write the title/caption/hashtags once, tick the platforms, hit Post.
 
 There's also a **WhatsApp (text only)** target that sends the caption to your own
 phone — handy for pasting into apps where captions don't carry over (e.g. finishing
@@ -24,6 +24,7 @@ server.
   - **YouTube** — playlist, privacy, tags, category
   - **TikTok** — draft (inbox) or direct post, privacy, comment/duet/stitch toggles
   - **Facebook** — publish immediately or save as Page draft
+  - **Threads** — optional topic tag (attached to the post as a chip)
 - OAuth connect/disconnect per account from the settings screen
 - All credentials and tokens stored in your OS user profile, never in the project
 
@@ -43,6 +44,13 @@ static HTML/JS in `public/`.
   while Meta fetches it
 - **X** — OAuth 1.0a signed requests, chunked v1.1 media upload for the video
   (INIT/APPEND/FINALIZE + status polling), then `POST /2/tweets`
+- **Threads** — Threads API on `graph.threads.net`, with its own app credentials
+  and login (separate from the Meta/Instagram flow). The OAuth redirect must be
+  HTTPS, so the local callback server runs on a self-signed cert (one-time browser
+  warning). Publishing mirrors Instagram: create a container from a public video
+  URL (served through the same tunnel), poll until processed, then publish.
+  An optional topic is sent as `topic_tag`. No custom video thumbnail — the
+  Threads API doesn't accept one, so Threads auto-picks a frame
 - **WhatsApp (text only)** — no API: opens WhatsApp Desktop through a
   `whatsapp://send` deep link with the caption pre-filled to your own chat, and you
   press Send. Because you send it manually in the real client, it stays clear of
@@ -67,6 +75,7 @@ own ceremony:
 | Instagram + Facebook | [Meta for Developers](https://developers.facebook.com) | One business app with the Instagram + Pages use cases, a Facebook Login for Business configuration ID, IG professional account linked to a FB Page |
 | Instagram hosting | [ngrok](https://ngrok.com) | Free account; either configure the ngrok agent on your machine or paste an authtoken in settings |
 | X | [X Developer Portal](https://developer.x.com) | App with **Read and write** permission; OAuth 1.0a API key + secret and access token + secret (all four pasted in settings) |
+| Threads | [Meta for Developers](https://developers.facebook.com) | Same app as Meta, with the **Access the Threads API** use case (`threads_basic` + `threads_content_publish`), redirect `https://localhost:8713/callback`, your Threads account added as a **Threads Tester** (and the invite accepted); paste the Threads app ID + secret in settings |
 | WhatsApp | — (no developer app) | WhatsApp Desktop installed and signed in; just your own phone number in international format (digits only, e.g. `31612345678`) |
 
 Notes from the trenches:
@@ -86,6 +95,15 @@ Notes from the trenches:
   library if you care). Default 280-char post limit — Premium accounts should
   allow up to 25,000 chars via the API, but this hasn't been tested here (the app
   sends the full caption either way, so an over-limit post would just error).
+- **Threads**: uses its own app ID/secret and login, even though it lives under the
+  same Meta app. Adding yourself as a Threads Tester in the App Dashboard isn't
+  enough — you also have to **accept the invite** inside Threads (Settings → Account
+  → Website permissions), or the API rejects `threads_basic`. Being Live/published
+  doesn't grant the permissions for non-testers; that would need App Review.
+  Threads allows **only one topic per post**, and a `#hashtag` in the text counts as
+  a competing topic — so when you set a Topic, the app **strips the `#` symbols** from
+  the caption/hashtags (the words stay as plain text) and sends the topic as a proper
+  tag instead. Leave the Topic empty and your hashtags post normally.
 - **WhatsApp**: it doesn't post anything — it just pops WhatsApp Desktop open with
   the caption ready, so you tap Send and copy it on your phone. Pairs well with the
   TikTok draft flow above (video's already in the draft; this gets you the caption).
