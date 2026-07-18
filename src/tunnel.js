@@ -147,6 +147,27 @@ function startTunnel(binary, port) {
   })
 }
 
+// Fresh trycloudflare hostnames take ~15-30s to appear in DNS; if the URL goes to
+// Meta before that, their fetch gets NXDOMAIN and the upload fails (error 2207077).
+// Checked via DNS-over-HTTPS because the local resolver caches the early misses.
+async function waitForDns(url, attempts = 30) {
+  const host = new URL(url).hostname
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    try {
+      const res = await fetch(`https://cloudflare-dns.com/dns-query?name=${host}&type=A`, {
+        headers: { accept: 'application/dns-json' }
+      })
+      const data = await res.json()
+      if (data.Answer && data.Answer.length > 0) {
+        await new Promise((resolve) => setTimeout(resolve, 5000))
+        return
+      }
+    } catch (err) {}
+    await new Promise((resolve) => setTimeout(resolve, 3000))
+  }
+  throw new Error('tunnel hostname never appeared in DNS')
+}
+
 // The free quick-tunnel service occasionally 500s — retry a few times before giving up
 async function startTunnelWithRetries(binary, port, attempts = 4) {
   let lastError
@@ -169,10 +190,15 @@ async function serveFile(filePath) {
 
   const ngrok = ngrokCreds()
   if (ngrok) {
+    let tunnel
     try {
-      const tunnel = await startNgrok(await ensureNgrok(), port, ngrok)
+      tunnel = await startNgrok(await ensureNgrok(), port, ngrok)
+      // a rate-limited account still starts a tunnel but 403s every request (ERR_NGROK_725)
+      const check = await fetch(tunnel.url + urlPath, { headers: { Range: 'bytes=0-0' } })
+      if (!check.ok) throw new Error('tunnel health check failed: HTTP ' + check.status)
       return { url: tunnel.url + urlPath, close: () => { tunnel.kill(); server.close() } }
     } catch (err) {
+      if (tunnel) tunnel.kill()
       // fall through to cloudflared
     }
   }
@@ -180,6 +206,12 @@ async function serveFile(filePath) {
   try {
     const binary = await ensureBinary()
     const tunnel = await startTunnelWithRetries(binary, port)
+    try {
+      await waitForDns(tunnel.url)
+    } catch (err) {
+      tunnel.kill()
+      throw err
+    }
     return { url: tunnel.url + urlPath, close: () => { tunnel.kill(); server.close() } }
   } catch (err) {
     server.close()
